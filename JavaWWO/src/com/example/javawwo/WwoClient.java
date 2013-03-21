@@ -1,0 +1,116 @@
+package com.example.javawwo;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.Timer;
+
+public class WwoClient {
+	public static final boolean LOGD = true;
+	
+	LocalWeather.Data weather;
+	LocationSearch.Data loc;
+	String ip = Utils.getIP();
+	
+	JLabel fancyLabel;
+	
+	public void createGUI() {
+		JFrame f = new JFrame();
+		f.setSize(500,500);
+        f.setUndecorated(true);
+        f.setLocationRelativeTo(null);
+        f.setBackground(new Color(0f, 0f, 0f, 0.1f));
+        //f.setOpacity(0.55f); //this only works for Java 7 and above
+		
+		String labelText =
+			      "<html>" + "<b>" + "Region" + ", " + "Country" + "</b>" +
+			      "<P>" +
+			      "<FONT COLOR=BLUE>" + "WeatherDesc" + "</FONT>" +
+			      "<p>" +
+			      "<FONT COLOR=BLUE>" + "temp_C" + "\u2103" + "</FONT>" +
+			      "</html>";
+			
+		try {
+			fancyLabel =
+				      new JLabel(labelText,
+				    		  	 Utils.createTransparentIcon(100,200),
+				                 JLabel.CENTER);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+        f.add(fancyLabel);
+        f.pack();
+        f.setVisible(true);
+
+        //create Timer
+        ActionListener taskPerformer = new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                updateGUI();
+            }
+        };
+        
+        Timer timer = new Timer(1000, taskPerformer);
+        timer.setInitialDelay(0);
+        timer.setDelay(6*3600*1000);
+        timer.start();
+	}
+	
+	public void updateGUI() {
+		if(ip != null) {
+			//get weather
+			LocalWeather lw = new LocalWeather(true);
+			String query = (lw.new Params(lw.key)).setQ(ip).getQueryString(LocalWeather.Params.class);
+			if(LOGD) System.out.println(query);
+			weather = lw.callAPI(query);
+			if(LOGD) System.out.println(weather.current_condition.weatherDesc);
+			if(LOGD) System.out.println(weather.current_condition.temp_C);
+			if(LOGD) System.out.println(weather.current_condition.weatherIconUrl);
+			
+			//get location
+			LocationSearch ls = new LocationSearch(true);
+			query = (ls.new Params(ls.key)).setQuery(ip).getQueryString(LocationSearch.Params.class);
+			if(LOGD) System.out.println(query);
+			loc = ls.callAPI(query);
+			if(LOGD) System.out.println(loc.region + ", " + loc.country);
+			
+			//updateWidget
+			String labelText =
+				      "<html>" + "<b>" + loc.region + ", " + loc.country + "</b>" +
+				      "<P>" +
+				      "<FONT COLOR=BLUE>" + weather.current_condition.weatherDesc + "</FONT>" +
+				      "<p>" +
+				      "<FONT COLOR=BLUE>" + weather.current_condition.temp_C + "\u2103" + "</FONT>" +
+				      "</html>";
+			
+			fancyLabel.setText(labelText);
+			try {
+				fancyLabel.setIcon(new ImageIcon(new URL(weather.current_condition.weatherIconUrl)));
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void main(String[] args) {
+		WwoClient client = new WwoClient();
+
+		client.createGUI();
+	}
+}
