@@ -76,22 +76,16 @@ public class WwoClient {
 			//get weather
 			LocalWeather lw = new LocalWeather(true);
 			String query = (lw.new Params(lw.key)).setQ(ip).getQueryString(LocalWeather.Params.class);
-			if(LOGD) System.out.println(query);
 			weather = lw.callAPI(query);
-			if(LOGD) System.out.println(weather.current_condition.weatherDesc);
-			if(LOGD) System.out.println(weather.current_condition.temp_C);
-			if(LOGD) System.out.println(weather.current_condition.weatherIconUrl);
 			
 			//get location
 			LocationSearch ls = new LocationSearch(true);
 			query = (ls.new Params(ls.key)).setQuery(ip).getQueryString(LocationSearch.Params.class);
-			if(LOGD) System.out.println(query);
 			loc = ls.callAPI(query);
-			if(LOGD) System.out.println(loc.region + ", " + loc.country);
 			
 			//updateWidget
 			String labelText =
-				      "<html>" + "<b>" + loc.region + ", " + loc.country + "</b>" +
+				      "<html>" + "<b>" + loc.result.region + ", " + loc.result.country + "</b>" +
 				      "<P>" +
 				      "<FONT COLOR=BLUE>" + weather.current_condition.weatherDesc + "</FONT>" +
 				      "<p>" +

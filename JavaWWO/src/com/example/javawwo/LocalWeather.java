@@ -1,14 +1,13 @@
 package com.example.javawwo;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 
-import org.xmlpull.v1.XmlPullParser;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 public class LocalWeather extends WwoApi {
 	public static final String FREE_API_ENDPOINT = "http://api.worldweatheronline.com/free/v1/weather.ashx";
@@ -30,23 +29,27 @@ public class LocalWeather extends WwoApi {
 	Data getLocalWeatherData(InputStream is) {
 		Data weather = null;
 		
-		try {			
-	        XmlPullParser xpp = getXmlPullParser(is);
-	        
-	        weather = new Data();
-	        CurrentCondition cc = new CurrentCondition();
-	        weather.current_condition = cc;
-	
-	        cc.temp_C = getTextForTag(xpp, "temp_C");
-	        System.out.println(cc.temp_C);
-	        cc.weatherIconUrl = getDecode(getTextForTag(xpp, "weatherIconUrl"));
-	        System.out.println(cc.weatherIconUrl);
-	        cc.weatherDesc = getDecode(getTextForTag(xpp, "weatherDesc"));
-	        System.out.println(cc.weatherIconUrl);
-		} catch (Exception e) {
+		try {
+			   // create JAXB context and initializing Marshaller
+			   JAXBContext jaxbContext = JAXBContext.newInstance(Data.class);
 			
-		}
-	
+			   Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+			
+			   // this will create Java object - Data from the XML response
+			   weather = (Data) jaxbUnmarshaller.unmarshal(is);
+		
+			   CurrentCondition cc = weather.current_condition;
+			   
+			   if(LOGD) {
+				   System.out.println(cc.temp_C);
+				   System.out.println(cc.weatherIconUrl);
+				   System.out.println(cc.weatherIconUrl);
+			   }
+		  } catch (JAXBException e) {
+			   // some exception occured
+			   e.printStackTrace();
+		  }
+
 		return weather;
 	}
 	
@@ -126,18 +129,28 @@ public class LocalWeather extends WwoApi {
 		}
 	}
 	
-	class Data {
+	@XmlRootElement
+	@XmlAccessorType( XmlAccessType.FIELD )
+	static class Data {
 		Request request;
 		CurrentCondition current_condition;
 		Weather weather;
+		
+		Data() {};
 	}
 	
-	class Request {
+	@XmlRootElement(namespace = "com.example.javawwo.LocalWeather.Data")
+	@XmlAccessorType( XmlAccessType.FIELD )
+	static class Request {
 		String type;
 		String query;
+		
+		Request() {};
 	}
 
-	class CurrentCondition {
+	@XmlRootElement(namespace = "com.example.javawwo.LocalWeather.Data")
+	@XmlAccessorType( XmlAccessType.FIELD )
+	static class CurrentCondition {
 	    String observation_time;
 	    String temp_C;
 	    String weatherCode;
@@ -152,9 +165,13 @@ public class LocalWeather extends WwoApi {
 	    String visibility;
 	    String pressure;
 	    String cloudcover;
+	    
+	    CurrentCondition() {};
 	}
 
-	class Weather {
+	@XmlRootElement(namespace = "com.example.javawwo.LocalWeather.Data")
+	@XmlAccessorType( XmlAccessType.FIELD )
+	static class Weather {
 	    String date;
 	    String tempMaxC;
 	    String tempMaxF;
@@ -167,6 +184,8 @@ public class LocalWeather extends WwoApi {
 	    String weatherIconUrl;
 	    String weatherDesc;
 	    String precipMM;
+	    
+	    Weather() {};
 	}
 }
 
