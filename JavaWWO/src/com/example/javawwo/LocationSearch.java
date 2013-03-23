@@ -7,13 +7,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.xmlpull.v1.XmlPullParser;
-
-import com.example.javawwo.LocalWeather.CurrentCondition;
-import com.example.javawwo.LocalWeather.Data;
 
 public class LocationSearch extends WwoApi {
 	public static final String FREE_API_ENDPOINT = "http://api.worldweatheronline.com/free/v1/search.ashx";

@@ -1,16 +1,9 @@
 package com.example.javawwo;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLEncoder;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 public class WwoApi {
 	public static final boolean LOGD = true;

@@ -38,9 +38,8 @@ public class LocalWeather extends WwoApi {
 			   // this will create Java object - Data from the XML response
 			   weather = (Data) jaxbUnmarshaller.unmarshal(is);
 		
-			   CurrentCondition cc = weather.current_condition;
-			   
 			   if(LOGD) {
+				   CurrentCondition cc = weather.current_condition;
 				   System.out.println(cc.temp_C);
 				   System.out.println(cc.weatherIconUrl);
 				   System.out.println(cc.weatherIconUrl);
